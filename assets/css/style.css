@@ -6499,49 +6499,97 @@ button.submit-btn:hover {
 
 
 /* =========================================
-   FIX HEADER MENU AT 100% ZOOM
+   SAAS HEADER - DESKTOP ONLY
+   100% ZOOM FIX
 ========================================= */
 
-@media (min-width: 992px) and (max-width: 1600px) {
+@media (min-width: 992px) {
 
-    .header-menu {
+    /* Header row */
+    .stackly-header-area > .container > .header-saas {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    /* Logo column */
+    .stackly-header-area > .container > .header-saas > .col-lg-3:first-child {
+        flex: 0 0 23%;
+        max-width: 23%;
+    }
+
+    /* Navigation column */
+    .stackly-header-area > .container > .header-saas > .col-lg-6 {
+        flex: 0 0 54%;
+        max-width: 54%;
+    }
+
+    /* Navigation */
+    .stackly-header-area > .container > .header-saas > .col-lg-6 .header-menu {
         width: 100%;
     }
 
-    .header-menu ul.nav_scroll {
+    .stackly-header-area > .container > .header-saas > .col-lg-6 .header-menu > ul.nav_scroll {
         display: flex !important;
         align-items: center;
         justify-content: center;
         flex-wrap: nowrap !important;
         width: 100%;
-        white-space: nowrap;
         margin: 0;
         padding: 0;
+        white-space: nowrap !important;
     }
 
-    .header-menu ul.nav_scroll li {
+    .stackly-header-area > .container > .header-saas > .col-lg-6 .header-menu > ul.nav_scroll > li {
         display: block !important;
-        flex: 0 0 auto;
-        white-space: nowrap;
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+        margin: 0;
     }
 
-    .header-menu ul.nav_scroll li a {
-        padding: 36px 8px !important;
-        white-space: nowrap;
+    .stackly-header-area > .container > .header-saas > .col-lg-6 .header-menu > ul.nav_scroll > li > a {
+        display: block !important;
+        padding: 36px 7px !important;
         font-size: 16px;
+        line-height: 28px;
+        white-space: nowrap !important;
     }
 
-    .header-saas {
+    /* Right column */
+    .stackly-header-area > .container > .header-saas > .col-lg-3:last-child {
+        flex: 0 0 23%;
+        max-width: 23%;
+    }
+
+    .stackly-header-area > .container > .header-saas .header-right {
+        display: flex;
         align-items: center;
-    }
-
-    .header-right {
+        justify-content: flex-end;
         gap: 15px;
         white-space: nowrap;
     }
-
-    .header-btn a {
-        padding: 12px 28px;
-        white-space: nowrap;
-    }
 }
+
+
+/* =========================================
+   NAV HOVER - ONLY SAAS HEADER
+========================================= */
+
+@media (min-width: 992px) {
+
+    /* Normal header */
+    .stackly-header-area > .container > .header-saas
+    .col-lg-6 > .header-menu > ul.nav_scroll > li > a:hover {
+        color: rgb(215, 173, 96) !important;
+    }
+
+    /* Sticky header */
+    .stackly-header-area.sticky > .container > .header-saas
+    .col-lg-6 > .header-menu > ul.nav_scroll > li > a:hover {
+        color: var(--primary-color) !important;
+    }
+
+}
+
+
+
