@@ -6497,3 +6497,51 @@ button.submit-btn:hover {
     color: #111111 !important;
 }
 
+
+/* =========================================
+   FIX HEADER MENU AT 100% ZOOM
+========================================= */
+
+@media (min-width: 992px) and (max-width: 1600px) {
+
+    .header-menu {
+        width: 100%;
+    }
+
+    .header-menu ul.nav_scroll {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: nowrap !important;
+        width: 100%;
+        white-space: nowrap;
+        margin: 0;
+        padding: 0;
+    }
+
+    .header-menu ul.nav_scroll li {
+        display: block !important;
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    .header-menu ul.nav_scroll li a {
+        padding: 36px 8px !important;
+        white-space: nowrap;
+        font-size: 16px;
+    }
+
+    .header-saas {
+        align-items: center;
+    }
+
+    .header-right {
+        gap: 15px;
+        white-space: nowrap;
+    }
+
+    .header-btn a {
+        padding: 12px 28px;
+        white-space: nowrap;
+    }
+}
