@@ -1,0 +1,2437 @@
+html_code = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stackly Admin — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-white2: #F6F2ED;
+      --color-white3: #FEFAF5;
+      --color-white4: #F8F6F3;
+      --color-btn: #F6F2ED4D;
+      --color-btn1: #F6F2ED1A;
+      --text-color: #616161;
+      --primary-color: #D4F772;
+      --dark: #1a1a1a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--color-white2);
+      color: var(--text-color);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ==================== BACKGROUND ==================== */
+    .page-bg {
+      position: fixed; inset: 0; z-index: 0; overflow: hidden;
+      background: linear-gradient(135deg, var(--color-white2) 0%, var(--color-white3) 50%, var(--color-white4) 100%);
+    }
+    .orb {
+      position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.4;
+    }
+    .orb-1 {
+      width: 550px; height: 550px;
+      background: radial-gradient(circle, rgba(212,247,114,0.4) 0%, transparent 70%);
+      top: -12%; right: -8%;
+    }
+    .orb-2 {
+      width: 450px; height: 450px;
+      background: radial-gradient(circle, rgba(212,247,114,0.28) 0%, transparent 70%);
+      bottom: -12%; left: -8%;
+    }
+    .grid-overlay {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.022) 1px, transparent 1px);
+      background-size: 65px 65px;
+      mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+    }
+
+    /* ==================== LAYOUT ==================== */
+    .dashboard { position: relative; z-index: 1; display: flex; min-height: 100vh; }
+
+    /* ==================== SIDEBAR ==================== */
+.sidebar {
+  width: 260px;
+  background: rgba(254,250,245,0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-right: 1px solid rgba(232,228,223,0.5);
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  position: fixed;
+  height: 100vh;
+  z-index: 10;
+  transition: width 0.3s ease;
+
+  /* Sidebar Scroll */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #d8d4cf;
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #bdb8b1;
+}
+
+    .sidebar.collapsed { width: 80px; }
+    .sidebar.collapsed ~ .main-content { margin-left: 80px; }
+
+
+    .logo {
+      display: flex; align-items: center; gap: 12px;
+      font-weight: 800; font-size: 20px; color: var(--dark);
+      margin-bottom: 32px; padding: 0 8px;
+    }
+    .logo-icon {
+      width: 40px; height: 40px; background: var(--primary-color);
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(212,247,114,0.3);
+    }
+    .logo-text { white-space: nowrap; overflow: hidden; transition: opacity 0.2s; }
+    .sidebar.collapsed .logo-text { opacity: 0; width: 0; }
+
+    .nav-section { margin-bottom: 24px; }
+    .nav-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1px; color: #A9A5A0; margin-bottom: 10px; padding: 0 12px;
+      white-space: nowrap; overflow: hidden; transition: opacity 0.2s;
+    }
+    .sidebar.collapsed .nav-label { opacity: 0; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; border-radius: 12px;
+      font-size: 14px; font-weight: 600; color: var(--text-color);
+      cursor: pointer; transition: all 0.2s; margin-bottom: 4px; white-space: nowrap;
+    }
+    .nav-item:hover { background: var(--color-white4); color: var(--dark); }
+    .nav-item.active {
+      background: var(--primary-color); color: var(--dark);
+      box-shadow: 0 4px 16px rgba(212,247,114,0.25);
+    }
+    .nav-icon { width: 22px; text-align: center; flex-shrink: 0; }
+    .nav-text { white-space: nowrap; overflow: hidden; transition: opacity 0.2s; }
+    .sidebar.collapsed .nav-text { opacity: 0; width: 0; }
+
+    .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid #E8E4DF; }
+    .user-card {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px; border-radius: 12px; cursor: pointer; transition: background 0.2s;
+    }
+    .user-card:hover { background: var(--color-white4); }
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-color), #b8e050);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: var(--dark); flex-shrink: 0;
+    }
+    .user-info { white-space: nowrap; overflow: hidden; transition: opacity 0.2s; }
+    .sidebar.collapsed .user-info { opacity: 0; width: 0; }
+    .user-name { font-size: 13px; font-weight: 700; color: var(--dark); }
+    .user-role { font-size: 11px; color: var(--text-color); }
+
+    .collapse-btn {
+      position: absolute; top: 28px; right: -14px;
+      width: 28px; height: 28px; background: var(--color-white3);
+      border: 1px solid #E8E4DF; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08); z-index: 20;
+      transition: transform 0.3s;
+    }
+    .sidebar.collapsed .collapse-btn { transform: rotate(180deg); }
+
+    /* ==================== MAIN CONTENT ==================== */
+    .main-content {
+      flex: 1; margin-left: 260px; padding: 28px 32px;
+      transition: margin-left 0.3s ease; min-width: 0;
+    }
+
+    /* ==================== TOPBAR ==================== */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px; flex-wrap: wrap; gap: 16px;
+    }
+    .page-title h1 {
+      font-size: 26px; font-weight: 800; color: var(--dark); letter-spacing: -0.5px;
+    }
+    .page-title p { font-size: 13px; color: var(--text-color); margin-top: 2px; }
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+    .search-box { position: relative; }
+    .search-box input {
+      width: 260px; padding: 10px 14px 10px 38px;
+      border: 1.5px solid #E0DCD7; border-radius: 12px;
+      background: var(--color-white4); font-size: 13px; outline: none;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .search-box input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(212,247,114,0.15);
+    }
+    .search-box::before {
+      content: '🔍'; position: absolute; left: 12px; top: 50%;
+      transform: translateY(-50%); font-size: 13px; opacity: 0.5;
+    }
+
+    .icon-btn {
+      width: 40px; height: 40px; border-radius: 12px;
+      border: 1.5px solid #E0DCD7; background: var(--color-white4);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 16px; transition: all 0.2s; position: relative;
+      text-decoration: none;
+    }
+    .icon-btn:hover {
+      border-color: var(--primary-color);
+      background: rgba(212,247,114,0.08);
+    }
+    .badge {
+      position: absolute; top: -2px; right: -2px;
+      width: 18px; height: 18px; background: #ef4444; color: #fff;
+      font-size: 10px; font-weight: 700; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--color-white3);
+    }
+
+    /* ==================== PANELS & CARDS ==================== */
+    .panel {
+      background: rgba(254,250,245,0.9);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(232,228,223,0.5); border-radius: 18px;
+      padding: 24px; margin-bottom: 18px;
+    }
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
+    }
+    .panel-title { font-size: 16px; font-weight: 700; color: var(--dark); }
+    .panel-action {
+      font-size: 12px; font-weight: 600; color: var(--text-color);
+      cursor: pointer; padding: 6px 12px; border-radius: 8px;
+      transition: all 0.2s; border: 1.5px solid #E0DCD7; background: var(--color-white4);
+    }
+    .panel-action:hover { background: var(--primary-color); color: var(--dark); border-color: var(--primary-color); }
+    .panel-action.primary { background: var(--primary-color); color: var(--dark); border-color: var(--primary-color); }
+    .panel-action.primary:hover { box-shadow: 0 4px 16px rgba(212,247,114,0.3); }
+
+    /* ==================== STATS ==================== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: rgba(254,250,245,0.9);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(232,228,223,0.5); border-radius: 18px;
+      padding: 22px; transition: all 0.25s; position: relative; overflow: hidden;
+    }
+    .stat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+      border-color: var(--primary-color);
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--primary-color); opacity: 0; transition: opacity 0.25s;
+    }
+    .stat-card:hover::before { opacity: 1; }
+
+    .stat-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .stat-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: rgba(212,247,114,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; transition: all 0.25s;
+    }
+    .stat-card:hover .stat-icon {
+      background: var(--primary-color); transform: scale(1.1);
+      box-shadow: 0 4px 16px rgba(212,247,114,0.3);
+    }
+    .stat-trend {
+      font-size: 12px; font-weight: 700;
+      padding: 4px 10px; border-radius: 20px;
+      background: rgba(212,247,114,0.15); color: #4a7c0f;
+    }
+    .stat-trend.down { background: #fef2f2; color: #ef4444; }
+    .stat-value {
+      font-size: 28px; font-weight: 800; color: var(--dark);
+      margin-bottom: 4px; letter-spacing: -0.5px;
+    }
+    .stat-label { font-size: 13px; color: var(--text-color); font-weight: 500; }
+
+    /* ==================== CONTENT GRID ==================== */
+    .content-grid {
+      display: grid; grid-template-columns: 2fr 1fr; gap: 18px;
+      margin-bottom: 28px;
+    }
+    .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+    /* ==================== CHARTS ==================== */
+    .chart-canvas { width: 100%; height: 260px; }
+    .chart-canvas.sm { height: 180px; }
+
+    /* ==================== ACTIVITY ==================== */
+    .activity-list { display: flex; flex-direction: column; gap: 14px; }
+    .activity-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 10px; border-radius: 12px; transition: background 0.2s;
+    }
+    .activity-item:hover { background: var(--color-white4); }
+    .activity-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      margin-top: 6px; flex-shrink: 0;
+    }
+    .activity-dot.green { background: var(--primary-color); box-shadow: 0 0 8px rgba(212,247,114,0.4); }
+    .activity-dot.blue { background: #60a5fa; }
+    .activity-dot.orange { background: #fb923c; }
+    .activity-dot.red { background: #ef4444; }
+    .activity-text { font-size: 13px; color: var(--dark); font-weight: 500; line-height: 1.5; }
+    .activity-time { font-size: 11px; color: #A9A5A0; margin-top: 2px; }
+
+    /* ==================== TABLE ==================== */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; padding: 12px 16px;
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: #A9A5A0; border-bottom: 1px solid #E8E4DF;
+    }
+    td {
+      padding: 14px 16px; font-size: 13px;
+      color: var(--dark); font-weight: 500; border-bottom: 1px solid #E8E4DF;
+    }
+    tr:hover td { background: var(--color-white4); }
+    .user-cell { display: flex; align-items: center; gap: 10px; }
+    .table-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary-color), #b8e050);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: var(--dark);
+    }
+    .status-badge {
+      padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    }
+    .status-active { background: rgba(212,247,114,0.2); color: #4a7c0f; }
+    .status-pending { background: #fef3c7; color: #b45309; }
+    .status-inactive { background: #f3f4f6; color: #6b7280; }
+
+    /* ==================== PROGRESS ==================== */
+    .progress-item { margin-bottom: 16px; }
+    .progress-header {
+      display: flex; justify-content: space-between;
+      margin-bottom: 6px; font-size: 13px;
+    }
+    .progress-label { font-weight: 600; color: var(--dark); }
+    .progress-value { font-weight: 700; color: var(--text-color); }
+    .progress-track {
+      height: 8px; background: var(--color-white4);
+      border-radius: 4px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; border-radius: 4px;
+      background: var(--primary-color); transition: width 1s ease;
+    }
+
+    /* ==================== PROJECT CARDS ==================== */
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px; margin-bottom: 28px;
+    }
+    .project-card {
+      background: rgba(254,250,245,0.9);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(232,228,223,0.5); border-radius: 18px;
+      padding: 24px; transition: all 0.25s;
+    }
+    .project-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+      border-color: var(--primary-color);
+    }
+    .project-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .project-tag {
+      padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    }
+    .tag-dev { background: rgba(212,247,114,0.2); color: #4a7c0f; }
+    .tag-design { background: #dbeafe; color: #1e40af; }
+    .tag-marketing { background: #fef3c7; color: #b45309; }
+    .project-title { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 6px; }
+    .project-desc { font-size: 13px; color: var(--text-color); margin-bottom: 16px; line-height: 1.5; }
+    .project-meta { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #A9A5A0; }
+    .project-avatars { display: flex; }
+    .project-avatars .table-avatar {
+      width: 28px; height: 28px; font-size: 10px;
+      margin-left: -8px; border: 2px solid var(--color-white3);
+    }
+    .project-avatars .table-avatar:first-child { margin-left: 0; }
+
+    /* ==================== USER CARDS ==================== */
+    .user-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px; margin-bottom: 28px;
+    }
+    .user-card-lg {
+      background: rgba(254,250,245,0.9);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(232,228,223,0.5); border-radius: 18px;
+      padding: 24px; text-align: center; transition: all 0.25s;
+    }
+    .user-card-lg:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+      border-color: var(--primary-color);
+    }
+    .user-card-lg .user-avatar { width: 56px; height: 56px; font-size: 20px; margin: 0 auto 12px; }
+    .user-card-name { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 2px; }
+    .user-card-role { font-size: 12px; color: var(--text-color); margin-bottom: 12px; }
+    .user-card-stats {
+      display: flex; justify-content: center; gap: 20px;
+      padding-top: 14px; border-top: 1px solid #E8E4DF;
+    }
+    .user-card-stat { text-align: center; }
+    .user-card-stat-value { font-size: 16px; font-weight: 700; color: var(--dark); }
+    .user-card-stat-label { font-size: 11px; color: #A9A5A0; }
+
+    /* ==================== SETTINGS ==================== */
+    .setting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 0; border-bottom: 1px solid #E8E4DF;
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-info h4 { font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 3px; }
+    .setting-info p { font-size: 12px; color: #A9A5A0; }
+    .toggle {
+      width: 44px; height: 24px; background: #E0DCD7; border-radius: 12px;
+      position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+    }
+    .toggle.on { background: var(--primary-color); }
+    .toggle::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 20px; height: 20px; background: #fff; border-radius: 50%;
+      transition: transform 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+    .toggle.on::after { transform: translateX(20px); }
+
+    /* ==================== NOTIFICATIONS ==================== */
+    .notif-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px; border-radius: 14px; transition: all 0.2s;
+      margin-bottom: 8px; border: 1px solid transparent;
+    }
+    .notif-item:hover { background: var(--color-white4); border-color: #E8E4DF; }
+    .notif-item.unread { background: rgba(212,247,114,0.06); border-color: rgba(212,247,114,0.2); }
+    .notif-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: var(--color-white4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .notif-item.unread .notif-icon { background: rgba(212,247,114,0.15); }
+    .notif-content h4 { font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 3px; }
+    .notif-content p { font-size: 12px; color: var(--text-color); line-height: 1.5; }
+    .notif-time { font-size: 11px; color: #A9A5A0; margin-top: 4px; white-space: nowrap; }
+
+    /* ==================== SECURITY ==================== */
+    .security-card {
+      background: rgba(254,250,245,0.9);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(232,228,223,0.5); border-radius: 18px;
+      padding: 24px; margin-bottom: 18px;
+    }
+    .security-card-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .security-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: rgba(212,247,114,0.12);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .security-card h3 { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+    .security-card p { font-size: 13px; color: var(--text-color); }
+
+    /* ==================== VIEW SWITCHING ==================== */
+    .page-view { display: none; animation: fadeIn 0.3s ease; }
+    .page-view.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==================== MOBILE ==================== */
+    .mobile-toggle {
+      display: none; width: 40px; height: 40px; border-radius: 12px;
+      border: 1.5px solid #E0DCD7; background: var(--color-white4);
+      align-items: center; justify-content: center;
+      cursor: pointer; font-size: 18px; margin-right: 12px;
+    }
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.3); z-index: 5;
+    }
+    .overlay.show { display: block; }
+
+    @media (max-width: 1000px) {
+      .content-grid, .bottom-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); width: 260px; }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; padding: 20px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .search-box input { width: 180px; }
+      .mobile-toggle { display: flex; }
+      .project-grid, .user-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 520px) {
+      .topbar-actions { width: 100%; justify-content: flex-end; }
+      .search-box { width: 100%; }
+      .search-box input { width: 100%; }
+    }
+
+    html, body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+@media (max-width: 767px) {
+    .main-content {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        padding: 15px;
+        overflow-x: hidden;
+    }
+
+    .bottom-grid,
+    .bottom-grid > div,
+    .panel {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .progress-track {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .progress-fill {
+        max-width: 100%;
+    }
+
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+}
+
+.logout-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    border: 1px solid #E8E4DF;
+    border-radius: 12px;
+
+    background: var(--color-white4);
+    color: #ef4444;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: #fef2f2;
+    border-color: #ef4444;
+}
+
+.logout-btn span:first-child {
+    width: 22px;
+    text-align: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.sidebar.collapsed .logout-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+.sidebar.collapsed .logout-btn {
+    justify-content: center;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.panel-action {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.user-card {
+    cursor: default;
+}
+
+.user-avatar,
+.user-info,
+.user-name,
+.user-role {
+    cursor: default;
+}
+
+.user-card a {
+    pointer-events: none;
+}
+
+.overview-side-card{
+    background:#fff;
+    border:1px solid #ECE8E2;
+    border-radius:18px;
+    padding:22px;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.overview-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.overview-head span{
+    font-size:14px;
+    color:#666;
+    font-weight:600;
+}
+
+.trend-badge{
+    background:#D4F772;
+    color:#111;
+    padding:6px 10px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:700;
+}
+
+.overview-side-card h2{
+    font-size:34px;
+    margin:0;
+    color:#111;
+}
+
+.overview-sub{
+    color:#777;
+    font-size:13px;
+    margin-top:-10px;
+}
+
+.overview-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 0;
+    border-top:1px solid #F0ECE6;
+}
+
+.overview-item strong{
+    display:block;
+    font-size:14px;
+    color:#222;
+}
+
+.overview-item p{
+    margin:3px 0 0;
+    font-size:12px;
+    color:#888;
+}
+
+.up{
+    color:#16A34A;
+    font-weight:700;
+}
+
+.down{
+    color:#DC2626;
+    font-weight:700;
+}
+
+.overview-btn{
+    margin-top:auto;
+    display:block;
+    text-align:center;
+    padding:12px;
+    background:#D4F772;
+    color:#111;
+    text-decoration:none;
+    border-radius:12px;
+    font-weight:700;
+}
+
+@media(max-width:768px){
+    .overview-side-card{
+        margin-top:20px;
+    }
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="page-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+<div class="logo">
+    <a href="index.html">
+        <img src="assets/images/logo.webp"
+             alt="Stackly Logo"
+             class="logo-image">
+    </a>
+</div>
+
+<div class="nav-section">
+
+    <div class="nav-label">Main</div>
+
+    <div class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+        <span class="nav-icon">◈</span>
+        <span class="nav-text">Dashboard</span>
+    </div>
+
+    <div class="nav-item" data-page="users" onclick="navigate('users')">
+        <span class="nav-icon">👤</span>
+        <span class="nav-text">Users</span>
+    </div>
+
+    <div class="nav-item" data-page="projects" onclick="navigate('projects')">
+        <span class="nav-icon">📁</span>
+        <span class="nav-text">Projects</span>
+    </div>
+
+    <div class="nav-item" data-page="analytics" onclick="navigate('analytics')">
+        <span class="nav-icon">📊</span>
+        <span class="nav-text">Analytics</span>
+    </div>
+
+</div>
+
+<div class="nav-section">
+
+    <div class="nav-label">Management</div>
+
+    <div class="nav-item" data-page="settings" onclick="navigate('settings')">
+        <span class="nav-icon">⚙</span>
+        <span class="nav-text">Settings</span>
+    </div>
+
+    <div class="nav-item" data-page="notifications" onclick="navigate('notifications')">
+        <span class="nav-icon">🔔</span>
+        <span class="nav-text">Notifications</span>
+    </div>
+
+    <div class="nav-item" data-page="security" onclick="navigate('security')">
+        <span class="nav-icon">🛡</span>
+        <span class="nav-text">Security</span>
+    </div>
+
+</div>
+
+     <div class="sidebar-footer">
+
+    <div class="user-card">
+        <div class="user-avatar" style="cursor:default;">
+            AD
+        </div>
+
+        <div class="user-info">
+            <div class="user-name">
+                Alex Doe
+            </div>
+
+            <div class="user-role" id="userEmail">
+                admin@example.com
+            </div>
+        </div>
+    </div>
+
+    <button
+        type="button"
+        class="logout-btn"
+        onclick="logoutUser()">
+
+        <span>↪</span>
+        <span class="logout-text">Logout</span>
+
+    </button>
+
+</div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+      <!-- Topbar -->
+      <div class="topbar">
+        <div style="display:flex;align-items:center;">
+          <div class="mobile-toggle" onclick="openSidebar()">☰</div>
+          <div class="page-title">
+            <h1 id="pageHeading">Dashboard Overview</h1>
+            <p id="pageSubheading">Welcome back, here\'s what\'s happening today.</p>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <div class="icon-btn" data-page="notifications" onclick="navigate('notifications')">🔔<div class="badge">3</div></div>
+          <a href="404.html" class="icon-btn">✉</a>
+          <div class="icon-btn"
+     style="background:linear-gradient(135deg,var(--primary-color),#b8e050);border:none;cursor:default;">
+    AD
+</div>
+      </div>
+
+      <!-- ========== DASHBOARD PAGE ========== -->
+      <div class="page-view active" id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">👤</div><div class="stat-trend">+12.5%</div></div><div class="stat-value">1,248</div><div class="stat-label">Total Users</div></div>
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">💰</div><div class="stat-trend">+8.2%</div></div><div class="stat-value">$48.2K</div><div class="stat-label">Total Revenue</div></div>
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">📈</div><div class="stat-trend down">-2.1%</div></div><div class="stat-value">342</div><div class="stat-label">Active Sessions</div></div>
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">⚡</div><div class="stat-trend">+24%</div></div><div class="stat-value">99.9%</div><div class="stat-label">Uptime</div></div>
+        </div>
+        <div class="content-grid">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Revenue Overview</div></div>
+            <canvas class="chart-canvas" id="dashChart1"></canvas>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Recent Activity</div><a href="404.html" class="panel-action">View All</a></div>
+            <div class="activity-list">
+              <div class="activity-item"><div class="activity-dot green"></div><div><div class="activity-text">New user: <strong>Sarah Miller</strong></div><div class="activity-time">2 min ago</div></div></div>
+              <div class="activity-item"><div class="activity-dot blue"></div><div><div class="activity-text">Project <strong>Alpha v2.0</strong> deployed</div><div class="activity-time">15 min ago</div></div></div>
+              <div class="activity-item"><div class="activity-dot orange"></div><div><div class="activity-text">Payment: <strong>Enterprise Plan</strong></div><div class="activity-time">1 hour ago</div></div></div>
+              <div class="activity-item"><div class="activity-dot green"></div><div><div class="activity-text">Server health check passed</div><div class="activity-time">2 hours ago</div></div></div>
+              <div class="activity-item"><div class="activity-dot blue"></div><div><div class="activity-text">New member: <strong>James Wilson</strong></div><div class="activity-time">3 hours ago</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-grid">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Recent Users</div><a href="404.html" class="panel-action">Manage Users</a></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>User</th><th>Role</th><th>Status</th><th>Joined</th></tr></thead>
+                <tbody>
+                  <tr><td><div class="user-cell"><div class="table-avatar">SM</div>Sarah Miller</div></td><td>Manager</td><td><span class="status-badge status-active">Active</span></td><td>Today</td></tr>
+                  <tr><td><div class="user-cell"><div class="table-avatar">JW</div>James Wilson</div></td><td>Editor</td><td><span class="status-badge status-pending">Pending</span></td><td>Yesterday</td></tr>
+                  <tr><td><div class="user-cell"><div class="table-avatar">EK</div>Emily Kim</div></td><td>User</td><td><span class="status-badge status-active">Active</span></td><td>Aug 22</td></tr>
+                  <tr><td><div class="user-cell"><div class="table-avatar">MR</div>Michael Ross</div></td><td>Admin</td><td><span class="status-badge status-inactive">Inactive</span></td><td>Aug 20</td></tr>
+                  <tr><td><div class="user-cell"><div class="table-avatar">LC</div>Lisa Chen</div></td><td>User</td><td><span class="status-badge status-active">Active</span></td><td>Aug 18</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+                    <div class="panel" style="margin-bottom:18px;">
+              <div class="panel-header"><div class="panel-title">System Usage</div></div>
+              <div class="progress-item"><div class="progress-header"><span class="progress-label">CPU Usage</span><span class="progress-value">72%</span></div><div class="progress-track"><div class="progress-fill" style="width:72%"></div></div></div>
+              <div class="progress-item"><div class="progress-header"><span class="progress-label">Memory</span><span class="progress-value">58%</span></div><div class="progress-track"><div class="progress-fill" style="width:58%"></div></div></div>
+              <div class="progress-item"><div class="progress-header"><span class="progress-label">Storage</span><span class="progress-value">84%</span></div><div class="progress-track"><div class="progress-fill" style="width:84%"></div></div></div>
+              <div class="progress-item"><div class="progress-header"><span class="progress-label">Bandwidth</span><span class="progress-value">45%</span></div><div class="progress-track"><div class="progress-fill" style="width:45%"></div></div></div>
+            </div>
+            <div class="panel">
+              <div class="panel-header"><div class="panel-title">User Growth</div></div>
+              <canvas class="chart-canvas sm" id="dashChart2"></canvas>
+            </div>
+
+            <div class="overview-side-card">
+    <div class="overview-head">
+        <span>Revenue Growth</span>
+        <div class="trend-badge">+18.6%</div>
+    </div>
+
+    <h2>₹8.45L</h2>
+    <p class="overview-sub">Total revenue this month</p>
+
+    <div class="overview-item">
+        <div>
+            <strong>New Clients</strong>
+            <p>128 joined</p>
+        </div>
+        <span class="up">+24%</span>
+    </div>
+
+    <div class="overview-item">
+        <div>
+            <strong>Subscriptions</strong>
+            <p>892 Active</p>
+        </div>
+        <span class="up">+12%</span>
+    </div>
+
+    <div class="overview-item">
+        <div>
+            <strong>Churn Rate</strong>
+            <p>2.1% this month</p>
+        </div>
+        <span class="down">-0.8%</span>
+    </div>
+
+    <a href="404.html" class="overview-btn">
+        View Report →
+    </a>
+</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== USERS PAGE ========== -->
+      <div class="page-view" id="page-users">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">👤</div><div class="stat-trend">+5.2%</div></div><div class="stat-value">1,248</div><div class="stat-label">Total Users</div></div>
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">✓</div><div class="stat-trend">+3.1%</div></div><div class="stat-value">1,102</div><div class="stat-label">Active Users</div></div>
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">⏳</div><div class="stat-trend">+12%</div></div><div class="stat-value">48</div><div class="stat-label">Pending</div></div>
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">🚫</div><div class="stat-trend down">-1.2%</div></div><div class="stat-value">98</div><div class="stat-label">Inactive</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">All Users</div>
+            <div style="display:flex;gap:10px;">
+              <a href="404.html" class="panel-action">
+    Filter ▾
+</a>
+
+<a href="404.html" class="panel-action primary">
+    + Add User
+</a>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th><th>Last Active</th><th>Actions</th></tr></thead>
+              <tbody>
+                <tr><td><div class="user-cell"><div class="table-avatar">SM</div>Sarah Miller</div></td><td>sarah@nexus.com</td><td>Manager</td><td><span class="status-badge status-active">Active</span></td><td>2 min ago</td><td><span style="font-size:16px;">⋮</span></td></tr>
+                <tr><td><div class="user-cell"><div class="table-avatar">JW</div>James Wilson</div></td><td>james@nexus.com</td><td>Editor</td><td><span class="status-badge status-pending">Pending</span></td><td>Yesterday</td><td><span style="font-size:16px;">⋮</span></td></tr>
+                <tr><td><div class="user-cell"><div class="table-avatar">EK</div>Emily Kim</div></td><td>emily@nexus.com</td><td>User</td><td><span class="status-badge status-active">Active</span></td><td>Aug 22</td><td><span style="font-size:16px;">⋮</span></td></tr>
+                <tr><td><div class="user-cell"><div class="table-avatar">MR</div>Michael Ross</div></td><td>michael@nexus.com</td><td>Admin</td><td><span class="status-badge status-inactive">Inactive</span></td><td>Aug 20</td><td><span style="font-size:16px;">⋮</span></td></tr>
+                <tr><td><div class="user-cell"><div class="table-avatar">LC</div>Lisa Chen</div></td><td>lisa@nexus.com</td><td>User</td><td><span class="status-badge status-active">Active</span></td><td>Aug 18</td><td><span style="font-size:16px;">⋮</span></td></tr>
+                <tr><td><div class="user-cell"><div class="table-avatar">DK</div>David Kim</div></td><td>david@nexus.com</td><td>Manager</td><td><span class="status-badge status-active">Active</span></td><td>Aug 15</td><td><span style="font-size:16px;">⋮</span></td></tr>
+                <tr><td><div class="user-cell"><div class="table-avatar">AP</div>Anna Park</div></td><td>anna@nexus.com</td><td>Editor</td><td><span class="status-badge status-active">Active</span></td><td>Aug 12</td><td><span style="font-size:16px;">⋮</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="user-grid">
+          <div class="user-card-lg"><div class="user-avatar" style="background:linear-gradient(135deg,#ff6b6b,#ee5a5a);">SM</div><div class="user-card-name">Sarah Miller</div><div class="user-card-role">Manager</div><div class="user-card-stats"><div class="user-card-stat"><div class="user-card-stat-value">24</div><div class="user-card-stat-label">Projects</div></div><div class="user-card-stat"><div class="user-card-stat-value">98%</div><div class="user-card-stat-label">Score</div></div></div></div>
+          <div class="user-card-lg"><div class="user-avatar" style="background:linear-gradient(135deg,#4ecdc4,#44b3ab);">JW</div><div class="user-card-name">James Wilson</div><div class="user-card-role">Editor</div><div class="user-card-stats"><div class="user-card-stat"><div class="user-card-stat-value">18</div><div class="user-card-stat-label">Articles</div></div><div class="user-card-stat"><div class="user-card-stat-value">A+</div><div class="user-card-stat-label">Grade</div></div></div></div>
+          <div class="user-card-lg"><div class="user-avatar" style="background:linear-gradient(135deg,#a78bfa,#8b5cf6);">EK</div><div class="user-card-name">Emily Kim</div><div class="user-card-role">User</div><div class="user-card-stats"><div class="user-card-stat"><div class="user-card-stat-value">12</div><div class="user-card-stat-label">Tasks</div></div><div class="user-card-stat"><div class="user-card-stat-value">95%</div><div class="user-card-stat-label">Done</div></div></div></div>
+          <div class="user-card-lg"><div class="user-avatar" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);">MR</div><div class="user-card-name">Michael Ross</div><div class="user-card-role">Admin</div><div class="user-card-stats"><div class="user-card-stat"><div class="user-card-stat-value">156</div><div class="user-card-stat-label">Tickets</div></div><div class="user-card-stat"><div class="user-card-stat-value">4.9</div><div class="user-card-stat-label">Rating</div></div></div></div>
+        </div>
+      </div>
+
+      <!-- ========== PROJECTS PAGE ========== -->
+      <div class="page-view" id="page-projects">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">📁</div><div class="stat-trend">+8.4%</div></div><div class="stat-value">42</div><div class="stat-label">Total Projects</div></div>
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">🚀</div><div class="stat-trend">+15%</div></div><div class="stat-value">18</div><div class="stat-label">In Progress</div></div>
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">✓</div><div class="stat-trend">+6.2%</div></div><div class="stat-value">24</div><div class="stat-label">Completed</div></div>
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">⏸</div><div class="stat-trend down">-2</div></div><div class="stat-value">3</div><div class="stat-label">On Hold</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Project Overview</div><a href="404.html" class="panel-action primary">
+    + New Project
+</a></div>
+          <canvas class="chart-canvas" id="projectChart"></canvas>
+        </div>
+        <div class="project-grid">
+          <div class="project-card">
+            <div class="project-header"><span class="project-tag tag-dev">Development</span><span style="font-size:18px;cursor:pointer;">⋮</span></div>
+            <div class="project-title">Nexus Platform v3.0</div>
+            <div class="project-desc">Complete redesign of the core platform with new analytics engine and improved UI.</div>
+            <div class="progress-item" style="margin-bottom:12px;"><div class="progress-header"><span class="progress-label" style="font-size:12px;">Progress</span><span class="progress-value" style="font-size:12px;">78%</span></div><div class="progress-track"><div class="progress-fill" style="width:78%"></div></div></div>
+            <div class="project-meta"><div class="project-avatars"><div class="table-avatar">AD</div><div class="table-avatar">SM</div><div class="table-avatar">JW</div></div><span>Due Aug 30</span></div>
+          </div>
+          <div class="project-card">
+            <div class="project-header"><span class="project-tag tag-design">Design</span><span style="font-size:18px;cursor:pointer;">⋮</span></div>
+            <div class="project-title">Mobile App Redesign</div>
+            <div class="project-desc">Modernizing the mobile experience with new design system and accessibility improvements.</div>
+            <div class="progress-item" style="margin-bottom:12px;"><div class="progress-header"><span class="progress-label" style="font-size:12px;">Progress</span><span class="progress-value" style="font-size:12px;">45%</span></div><div class="progress-track"><div class="progress-fill" style="width:45%"></div></div></div>
+            <div class="project-meta"><div class="project-avatars"><div class="table-avatar">LC</div><div class="table-avatar">EK</div></div><span>Due Sep 15</span></div>
+          </div>
+          <div class="project-card">
+            <div class="project-header"><span class="project-tag tag-marketing">Marketing</span><span style="font-size:18px;cursor:pointer;">⋮</span></div>
+            <div class="project-title">Q4 Campaign Launch</div>
+            <div class="project-desc">End-of-year marketing campaign including social media, email, and content strategy.</div>
+            <div class="progress-item" style="margin-bottom:12px;"><div class="progress-header"><span class="progress-label" style="font-size:12px;">Progress</span><span class="progress-value" style="font-size:12px;">92%</span></div><div class="progress-track"><div class="progress-fill" style="width:92%"></div></div></div>
+            <div class="project-meta"><div class="project-avatars"><div class="table-avatar">MR</div><div class="table-avatar">AP</div><div class="table-avatar">DK</div></div><span>Due Aug 28</span></div>
+          </div>
+          <div class="project-card">
+            <div class="project-header"><span class="project-tag tag-dev">Development</span><span style="font-size:18px;cursor:pointer;">⋮</span></div>
+            <div class="project-title">API Gateway Migration</div>
+            <div class="project-desc">Migrating legacy APIs to the new microservices architecture with improved performance.</div>
+            <div class="progress-item" style="margin-bottom:12px;"><div class="progress-header"><span class="progress-label" style="font-size:12px;">Progress</span><span class="progress-value" style="font-size:12px;">32%</span></div><div class="progress-track"><div class="progress-fill" style="width:32%"></div></div></div>
+            <div class="project-meta"><div class="project-avatars"><div class="table-avatar">AD</div><div class="table-avatar">DK</div></div><span>Due Oct 10</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== ANALYTICS PAGE ========== -->
+      <div class="page-view" id="page-analytics">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">👁</div><div class="stat-trend">+18.2%</div></div><div class="stat-value">48.2K</div><div class="stat-label">Page Views</div></div>
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">🖱</div><div class="stat-trend">+5.4%</div></div><div class="stat-value">12.8K</div><div class="stat-label">Unique Visitors</div></div>
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">📉</div><div class="stat-trend down">-1.8%</div></div><div class="stat-value">3.2%</div><div class="stat-label">Bounce Rate</div></div>
+          <div class="stat-card"><div class="stat-header"><div class="stat-icon">⏱</div><div class="stat-trend">+8.1%</div></div><div class="stat-value">4:32</div><div class="stat-label">Avg. Session</div></div>
+        </div>
+        <div class="content-grid">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Traffic Sources</div><a href="404.html" class="panel-action">
+    Last 30 Days ▾
+</a></div>
+            <canvas class="chart-canvas" id="analyticsChart1"></canvas>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Device Breakdown</div></div>
+            <canvas class="chart-canvas" id="analyticsChart2"></canvas>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">Top Performing Pages</div><a href="404.html" class="panel-action">
+    Export CSV
+</a></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Page</th><th>Views</th><th>Unique</th><th>Avg Time</th><th>Bounce</th><th>Trend</th></tr></thead>
+              <tbody>
+                <tr><td><strong>/dashboard</strong></td><td>12,450</td><td>8,230</td><td>3:42</td><td>22%</td><td><span class="stat-trend">+12%</span></td></tr>
+                <tr><td><strong>/projects</strong></td><td>9,820</td><td>6,100</td><td>2:18</td><td>31%</td><td><span class="stat-trend">+8%</span></td></tr>
+                <tr><td><strong>/analytics</strong></td><td>7,340</td><td>4,560</td><td>4:12</td><td>18%</td><td><span class="stat-trend">+15%</span></td></tr>
+                <tr><td><strong>/settings</strong></td><td>5,120</td><td>3,890</td><td>1:45</td><td>45%</td><td><span class="stat-trend down">-3%</span></td></tr>
+                <tr><td><strong>/users</strong></td><td>4,890</td><td>3,200</td><td>2:55</td><td>28%</td><td><span class="stat-trend">+5%</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== SETTINGS PAGE ========== -->
+      <div class="page-view" id="page-settings">
+        <div class="content-grid">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title">Profile Settings</div></div>
+            <div style="text-align:center;margin-bottom:24px;">
+              <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--primary-color),#b8e050);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--dark);margin:0 auto 12px;">AD</div>
+              <div style="font-size:16px;font-weight:700;color:var(--dark);">Alex Doe</div>
+              <div style="font-size:13px;color:var(--text-color);">Super Admin</div>
+            </div>
+            <div class="form-group" style="margin-bottom:16px;"><label style="display:block;font-size:13px;font-weight:600;color:var(--dark);margin-bottom:6px;">Full Name</label><input type="text" value="Alex Doe" style="width:100%;padding:12px 14px;border:1.5px solid #E0DCD7;border-radius:12px;background:var(--color-white4);font-size:14px;color:var(--dark);outline:none;font-family:inherit;"></div>
+            <div class="form-group" style="margin-bottom:16px;"><label style="display:block;font-size:13px;font-weight:600;color:var(--dark);margin-bottom:6px;">Email</label><input type="email" value="alex@nexus.com" style="width:100%;padding:12px 14px;border:1.5px solid #E0DCD7;border-radius:12px;background:var(--color-white4);font-size:14px;color:var(--dark);outline:none;font-family:inherit;"></div>
+            <div class="form-group" style="margin-bottom:16px;"><label style="display:block;font-size:13px;font-weight:600;color:var(--dark);margin-bottom:6px;">Bio</label><textarea style="width:100%;padding:12px 14px;border:1.5px solid #E0DCD7;border-radius:12px;background:var(--color-white4);font-size:14px;color:var(--dark);outline:none;font-family:inherit;min-height:80px;resize:vertical;">Platform administrator with 5+ years of experience.</textarea></div>
+            <a href="404.html"
+   class="panel-action primary"
+   style="width:100%;padding:12px;margin-top:8px;border:none;text-align:center;">
+    Save Changes
+</a>
+          </div>
+          <div>
+       <div class="panel" style="margin-bottom:18px;">
+
+    <div class="panel-header">
+        <div class="panel-title">Preferences</div>
+    </div>
+
+    <div class="setting-row">
+        <div class="setting-info">
+            <h4>Email Notifications</h4>
+            <p>Receive updates via email</p>
+        </div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+    </div>
+
+    <div class="setting-row">
+        <div class="setting-info">
+            <h4>Push Notifications</h4>
+            <p>Browser push alerts</p>
+        </div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+    </div>
+
+    <div class="setting-row">
+        <div class="setting-info">
+            <h4>Dark Mode</h4>
+            <p>Switch to dark theme</p>
+        </div>
+        <div class="toggle" onclick="this.classList.toggle('on')"></div>
+    </div>
+
+    <div class="setting-row">
+        <div class="setting-info">
+            <h4>Auto-save</h4>
+            <p>Save drafts automatically</p>
+        </div>
+        <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+    </div>
+
+</div>
+            <div class="panel">
+              <div class="panel-header"><div class="panel-title">Account</div></div>
+              <div class="setting-row"><div class="setting-info"><h4>Change Password</h4><p>Update your account password</p></div><a href="404.html" class="panel-action">
+    Change
+</a></div>
+              <div class="setting-row"><div class="setting-info"><h4>Two-Factor Auth</h4><p>Add extra security layer</p></div><a href="404.html" class="panel-action">
+    Enable
+</a></div>
+              <div class="setting-row"><div class="setting-info"><h4>API Keys</h4><p>Manage developer access</p></div><a href="404.html" class="panel-action">
+    Manage
+</a></div>
+              <div class="setting-row"><div class="setting-info"><h4>Delete Account</h4><p>Permanently remove account</p></div><a href="404.html"
+   class="panel-action"
+   style="color:#ef4444;border-color:#ef4444;">
+    Delete
+</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== NOTIFICATIONS PAGE ========== -->
+      <div class="page-view" id="page-notifications">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">All Notifications</div>
+            <div style="display:flex;gap:10px;">
+             <a href="404.html" class="panel-action">
+    Mark All Read
+</a>
+
+<a href="404.html" class="panel-action">
+    Settings
+</a>
+            </div>
+          </div>
+          <div class="notif-item unread">
+            <div class="notif-icon">👤</div>
+            <div class="notif-content" style="flex:1;">
+              <h4>New User Registration</h4>
+              <p>Sarah Miller has joined the platform as a Manager.</p>
+            </div>
+            <div class="notif-time">2 min ago</div>
+          </div>
+          <div class="notif-item unread">
+            <div class="notif-icon">🚀</div>
+            <div class="notif-content" style="flex:1;">
+              <h4>Deployment Successful</h4>
+              <p>Project Alpha v2.0 has been deployed to production.</p>
+            </div>
+            <div class="notif-time">15 min ago</div>
+          </div>
+          <div class="notif-item unread">
+            <div class="notif-icon">💰</div>
+            <div class="notif-content" style="flex:1;">
+              <h4>Payment Received</h4>
+              <p>Enterprise Plan payment of $2,400 has been processed.</p>
+            </div>
+            <div class="notif-time">1 hour ago</div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon">⚙</div>
+            <div class="notif-content" style="flex:1;">
+              <h4>System Update</h4>
+              <p>Server maintenance completed successfully.</p>
+            </div>
+            <div class="notif-time">3 hours ago</div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon">🛡</div>
+            <div class="notif-content" style="flex:1;">
+              <h4>Security Alert</h4>
+              <p>Unusual login attempt detected from IP 192.168.1.45.</p>
+            </div>
+            <div class="notif-time">5 hours ago</div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon">📊</div>
+            <div class="notif-content" style="flex:1;">
+              <h4>Weekly Report</h4>
+              <p>Your weekly analytics report is now available.</p>
+            </div>
+            <div class="notif-time">Yesterday</div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-icon">📁</div>
+            <div class="notif-content" style="flex:1;">
+              <h4>Project Update</h4>
+              <p>Mobile App Redesign reached 45% completion.</p>
+            </div>
+            <div class="notif-time">Yesterday</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== SECURITY PAGE ========== -->
+<div class="page-view" id="page-security">
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">🛡</div>
+                <div class="stat-trend">Secure</div>
+            </div>
+            <div class="stat-value">A+</div>
+            <div class="stat-label">Security Score</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">🔒</div>
+                <div class="stat-trend">Active</div>
+            </div>
+            <div class="stat-value">On</div>
+            <div class="stat-label">2FA Status</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">👁</div>
+                <div class="stat-trend">+2</div>
+            </div>
+            <div class="stat-value">12</div>
+            <div class="stat-label">Active Sessions</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon">⚠</div>
+                <div class="stat-trend">0</div>
+            </div>
+            <div class="stat-value">0</div>
+            <div class="stat-label">Threats Blocked</div>
+        </div>
+
+    </div>
+
+    <div class="content-grid">
+
+        <div>
+
+            <!-- Two Factor Authentication -->
+            <div class="security-card">
+
+                <div class="security-card-header">
+                    <div class="security-icon">🔐</div>
+                    <div>
+                        <h3>Two-Factor Authentication</h3>
+                        <p>Add an extra layer of security to your account</p>
+                    </div>
+                </div>
+                
+
+                <div class="setting-row" style="border-bottom:none;padding:8px 0;">
+                    <div class="setting-info">
+                        <h4>Authenticator App</h4>
+                        <p>Use Google Authenticator or similar</p>
+                    </div>
+                    <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+
+                <div class="setting-row" style="border-bottom:none;padding:8px 0;">
+                    <div class="setting-info">
+                        <h4>SMS Verification</h4>
+                        <p>Receive codes via text message</p>
+                    </div>
+                    <div class="toggle" onclick="this.classList.toggle('on')"></div>
+                </div>
+
+                <div class="setting-row" style="border-bottom:none;padding:8px 0;">
+                    <div class="setting-info">
+                        <h4>Backup Codes</h4>
+                        <p>Generate recovery codes</p>
+                    </div>
+                    <a href="404.html"
+   class="panel-action">
+    Generate
+</a>
+                </div>
+
+            </div>
+
+
+            <!-- Login History -->
+            <div class="security-card">
+
+                <div class="security-card-header">
+                    <div class="security-icon">🌐</div>
+                    <div>
+                        <h3>Login History</h3>
+                        <p>Recent account access activity</p>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Device</th>
+                                <th>Location</th>
+                                <th>IP Address</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr>
+                                <td>Chrome / MacOS</td>
+                                <td>New York, USA</td>
+                                <td>192.168.1.1</td>
+                                <td>Just now</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        Current
+                                    </span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Safari / iOS</td>
+                                <td>London, UK</td>
+                                <td>10.0.0.5</td>
+                                <td>2 hours ago</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        Active
+                                    </span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Firefox / Windows</td>
+                                <td>Berlin, DE</td>
+                                <td>172.16.0.8</td>
+                                <td>Yesterday</td>
+                                <td>
+                                    <span class="status-badge status-inactive">
+                                        Expired
+                                    </span>
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div>
+
+            <!-- Password Policy -->
+            <div class="security-card">
+
+                <div class="security-card-header">
+                    <div class="security-icon">🔑</div>
+                    <div>
+                        <h3>Password Policy</h3>
+                        <p>Enforce strong password requirements</p>
+                    </div>
+                </div>
+
+                <div class="setting-row" style="border-bottom:none;padding:8px 0;">
+                    <div class="setting-info">
+                        <h4>Minimum Length</h4>
+                        <p>Minimum 8 characters required</p>
+                    </div>
+                    <span class="status-badge status-active">8+</span>
+                </div>
+
+                <div class="setting-row" style="border-bottom:none;padding:8px 0;">
+                    <div class="setting-info">
+                        <h4>Uppercase Letter</h4>
+                        <p>Require at least one uppercase letter</p>
+                    </div>
+                    <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+
+                <div class="setting-row" style="border-bottom:none;padding:8px 0;">
+                    <div class="setting-info">
+                        <h4>Numbers</h4>
+                        <p>Require at least one number</p>
+                    </div>
+                    <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+
+                <div class="setting-row" style="border-bottom:none;padding:8px 0;">
+                    <div class="setting-info">
+                        <h4>Special Characters</h4>
+                        <p>Require at least one special character</p>
+                    </div>
+                    <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+                </div>
+
+                <div class="setting-row" style="border-bottom:none;padding:8px 0;">
+                    <div class="setting-info">
+                        <h4>Password Expiry</h4>
+                        <p>Require password change every 90 days</p>
+                    </div>
+                    <div class="toggle" onclick="this.classList.toggle('on')"></div>
+                </div>
+
+            </div>
+
+
+            <!-- Active Sessions -->
+            <div class="security-card">
+
+                <div class="security-card-header">
+                    <div class="security-icon">💻</div>
+                    <div>
+                        <h3>Active Sessions</h3>
+                        <p>Devices currently signed in</p>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Chrome on MacOS</h4>
+                        <p>New York, USA · Current session</p>
+                    </div>
+                    <span class="status-badge status-active">
+                        Current
+                    </span>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Safari on iPhone</h4>
+                        <p>London, UK · 2 hours ago</p>
+                    </div>
+                    <button class="panel-action" onclick="logoutSession(this)">
+                        Logout
+                    </button>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Chrome on Windows</h4>
+                        <p>Berlin, DE · Yesterday</p>
+                    </div>
+                    <button class="panel-action" onclick="logoutSession(this)">
+                        Logout
+                    </button>
+                </div>
+
+              <a href="404.html"
+   class="panel-action primary"
+   style="width:100%;margin-top:16px;padding:10px;text-align:center;">
+    Logout All Other Sessions
+</a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+function generateBackupCodes() {
+    alert("Backup codes generated successfully.");
+}
+
+function logoutSession(button) {
+    const row = button.closest(".setting-row");
+
+    if (row) {
+        row.style.opacity = "0.5";
+        button.textContent = "Logged Out";
+        button.disabled = true;
+    }
+}
+
+function logoutAllSessions() {
+    if (confirm("Are you sure you want to logout from all other sessions?")) {
+        alert("All other sessions have been logged out.");
+    }
+}
+</script>
+
+                <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const pageData = {
+        dashboard: {
+            title: "Dashboard Overview",
+            subtitle: "Welcome back, here's what's happening today."
+        },
+        users: {
+            title: "Users",
+            subtitle: "Manage and monitor all registered users."
+        },
+        projects: {
+            title: "Projects",
+            subtitle: "Track projects, progress, and team activity."
+        },
+        analytics: {
+            title: "Analytics",
+            subtitle: "Review traffic, performance, and engagement."
+        },
+        settings: {
+            title: "Settings",
+            subtitle: "Manage your profile and account preferences."
+        },
+        notifications: {
+            title: "Notifications",
+            subtitle: "Stay updated with the latest activity."
+        },
+        security: {
+            title: "Security",
+            subtitle: "Monitor account security and access."
+        }
+    };
+
+    /* ==================== PAGE NAVIGATION ==================== */
+
+    window.navigate = function (page) {
+
+    document.querySelectorAll(".page-view").forEach(function (view) {
+        view.classList.remove("active");
+    });
+
+    const target = document.getElementById("page-" + page);
+
+    if (target) {
+        target.classList.add("active");
+    }
+
+    document.querySelectorAll(".nav-item").forEach(function (item) {
+        item.classList.toggle(
+            "active",
+            item.dataset.page === page
+        );
+    });
+
+    const data = pageData[page];
+
+    if (data) {
+        const heading = document.getElementById("pageHeading");
+        const subheading = document.getElementById("pageSubheading");
+
+        if (heading) {
+            heading.textContent = data.title;
+        }
+
+        if (subheading) {
+            subheading.textContent = data.subtitle;
+        }
+    }
+
+    if (window.innerWidth <= 768) {
+        closeSidebar();
+    }
+
+    /*
+     * IMPORTANT:
+     * Redraw charts after the page becomes visible.
+     */
+    requestAnimationFrame(function () {
+        drawAllCharts();
+    });
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+};
+
+    /* ==================== SIDEBAR ==================== */
+
+    window.toggleSidebar = function () {
+        const sidebar = document.getElementById("sidebar");
+
+        if (sidebar) {
+            sidebar.classList.toggle("collapsed");
+        }
+    };
+
+    window.openSidebar = function () {
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("overlay");
+
+        if (sidebar) {
+            sidebar.classList.add("open");
+        }
+
+        if (overlay) {
+            overlay.classList.add("show");
+        }
+    };
+
+    window.closeSidebar = function () {
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("overlay");
+
+        if (sidebar) {
+            sidebar.classList.remove("open");
+        }
+
+        if (overlay) {
+            overlay.classList.remove("show");
+        }
+    };
+
+
+    /* ==================== KEYBOARD ==================== */
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            closeSidebar();
+        }
+    });
+
+
+    /* ==================== CANVAS SETUP ==================== */
+
+    function setupCanvas(id, height) {
+
+        const canvas = document.getElementById(id);
+
+        if (!canvas) {
+            return null;
+        }
+
+        canvas.style.width = "100%";
+        canvas.style.height = height + "px";
+
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+
+        canvas.width = Math.max(1, Math.round(rect.width * dpr));
+        canvas.height = Math.max(1, Math.round(height * dpr));
+
+        const ctx = canvas.getContext("2d");
+
+        ctx.setTransform(
+            dpr,
+            0,
+            0,
+            dpr,
+            0,
+            0
+        );
+
+        return {
+            canvas: canvas,
+            ctx: ctx,
+            width: rect.width,
+            height: height
+        };
+    }
+
+
+    /* ==================== LINE CHART ==================== */
+
+    function drawLineChart(id, data, labels) {
+
+        const chart = setupCanvas(id, 260);
+
+        if (!chart) {
+            return;
+        }
+
+        const ctx = chart.ctx;
+        const w = chart.width;
+        const h = chart.height;
+
+        const pad = {
+            top: 20,
+            right: 20,
+            bottom: 30,
+            left: 45
+        };
+
+        const max = Math.max(...data) * 1.1;
+
+        const chartW = Math.max(
+            1,
+            w - pad.left - pad.right
+        );
+
+        const chartH = Math.max(
+            1,
+            h - pad.top - pad.bottom
+        );
+
+        ctx.clearRect(0, 0, w, h);
+
+        /* Grid */
+
+        ctx.strokeStyle = "rgba(0,0,0,0.05)";
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i <= 4; i++) {
+
+            const y =
+                pad.top +
+                chartH * (i / 4);
+
+            ctx.beginPath();
+            ctx.moveTo(pad.left, y);
+            ctx.lineTo(w - pad.right, y);
+            ctx.stroke();
+
+            ctx.fillStyle = "#A9A5A0";
+            ctx.font = "11px Inter";
+            ctx.textAlign = "left";
+
+            ctx.fillText(
+                Math.round(
+                    max * (1 - i / 4)
+                ).toLocaleString(),
+                0,
+                y + 4
+            );
+        }
+
+        const stepX =
+            data.length > 1
+                ? chartW / (data.length - 1)
+                : chartW;
+
+        const points = data.map(function (value, index) {
+
+            return {
+                x: pad.left + index * stepX,
+                y:
+                    pad.top +
+                    chartH *
+                    (1 - value / max)
+            };
+
+        });
+
+        /* Area */
+
+        const gradient =
+            ctx.createLinearGradient(
+                0,
+                pad.top,
+                0,
+                h - pad.bottom
+            );
+
+        gradient.addColorStop(
+            0,
+            "rgba(212,247,114,0.25)"
+        );
+
+        gradient.addColorStop(
+            1,
+            "rgba(212,247,114,0)"
+        );
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            points[0].x,
+            h - pad.bottom
+        );
+
+        points.forEach(function (point) {
+            ctx.lineTo(point.x, point.y);
+        });
+
+        ctx.lineTo(
+            points[points.length - 1].x,
+            h - pad.bottom
+        );
+
+        ctx.closePath();
+
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        /* Line */
+
+        ctx.beginPath();
+
+        points.forEach(function (point, index) {
+
+            if (index === 0) {
+                ctx.moveTo(point.x, point.y);
+            } else {
+                ctx.lineTo(point.x, point.y);
+            }
+
+        });
+
+        ctx.strokeStyle = "#D4F772";
+        ctx.lineWidth = 3;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        ctx.stroke();
+
+        /* Points */
+
+        points.forEach(function (point) {
+
+            ctx.beginPath();
+            ctx.arc(
+                point.x,
+                point.y,
+                4,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fillStyle = "#fff";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(
+                point.x,
+                point.y,
+                4,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.strokeStyle = "#D4F772";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+        });
+
+        /* Labels */
+
+        ctx.fillStyle = "#A9A5A0";
+        ctx.font = "11px Inter";
+        ctx.textAlign = "center";
+
+        labels.forEach(function (label, index) {
+
+            if (points[index]) {
+                ctx.fillText(
+                    label,
+                    points[index].x,
+                    h - 8
+                );
+            }
+
+        });
+    }
+
+
+    /* ==================== BAR CHART ==================== */
+
+    function drawBarChart(id, data, labels) {
+
+        const chart = setupCanvas(id, 260);
+
+        if (!chart) {
+            return;
+        }
+
+        const ctx = chart.ctx;
+        const w = chart.width;
+        const h = chart.height;
+
+        const pad = {
+            top: 15,
+            right: 15,
+            bottom: 30,
+            left: 35
+        };
+
+        const max = Math.max(...data) * 1.1;
+
+        const availableW =
+            Math.max(
+                1,
+                w - pad.left - pad.right
+            );
+
+        const availableH =
+            Math.max(
+                1,
+                h - pad.top - pad.bottom
+            );
+
+        const step =
+            availableW / data.length;
+
+        const barW = step * 0.55;
+
+        ctx.clearRect(0, 0, w, h);
+
+        data.forEach(function (value, index) {
+
+            const barH =
+                (value / max) *
+                availableH;
+
+            const x =
+                pad.left +
+                index * step +
+                (step - barW) / 2;
+
+            const y =
+                h -
+                pad.bottom -
+                barH;
+
+            const gradient =
+                ctx.createLinearGradient(
+                    0,
+                    y,
+                    0,
+                    h - pad.bottom
+                );
+
+            gradient.addColorStop(
+                0,
+                "#D4F772"
+            );
+
+            gradient.addColorStop(
+                1,
+                "rgba(212,247,114,0.3)"
+            );
+
+            ctx.fillStyle = gradient;
+
+            ctx.beginPath();
+
+            if (ctx.roundRect) {
+                ctx.roundRect(
+                    x,
+                    y,
+                    barW,
+                    barH,
+                    6
+                );
+            } else {
+                ctx.rect(
+                    x,
+                    y,
+                    barW,
+                    barH
+                );
+            }
+
+            ctx.fill();
+
+            ctx.fillStyle = "#A9A5A0";
+            ctx.font = "10px Inter";
+            ctx.textAlign = "center";
+
+            ctx.fillText(
+                labels[index],
+                x + barW / 2,
+                h - 8
+            );
+
+        });
+    }
+
+
+    /* ==================== DRAW ALL CHARTS ==================== */
+
+    function drawAllCharts() {
+
+        drawLineChart(
+            "dashChart1",
+            [
+                12000,
+                19000,
+                15000,
+                25000,
+                22000,
+                30000,
+                28000,
+                35000,
+                42000,
+                38000,
+                45000,
+                48000
+            ],
+            [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
+            ]
+        );
+
+        drawLineChart(
+            "dashChart2",
+            [
+                45,
+                62,
+                78,
+                95,
+                110,
+                128,
+                145
+            ],
+            [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+            ]
+        );
+
+        drawLineChart(
+            "projectChart",
+            [
+                18,
+                25,
+                22,
+                35,
+                30,
+                42,
+                48,
+                55,
+                62,
+                70,
+                76,
+                84
+            ],
+            [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
+            ]
+        );
+
+        drawLineChart(
+            "analyticsChart1",
+            [
+                22,
+                31,
+                28,
+                42,
+                38,
+                50,
+                47,
+                61,
+                58,
+                72,
+                68,
+                82
+            ],
+            [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
+            ]
+        );
+
+        drawBarChart(
+            "analyticsChart2",
+            [
+                65,
+                48,
+                32,
+                20
+            ],
+            [
+                "Mobile",
+                "Desktop",
+                "Tablet",
+                "Other"
+            ]
+        );
+    }
+
+
+    /* ==================== SEARCH ==================== */
+
+    document
+        .querySelectorAll(".search-box input")
+        .forEach(function (input) {
+
+            input.addEventListener(
+                "input",
+                function () {
+
+                    const query =
+                        this.value
+                            .toLowerCase()
+                            .trim();
+
+                    const visiblePage =
+                        document.querySelector(
+                            ".page-view.active"
+                        );
+
+                    if (!visiblePage) {
+                        return;
+                    }
+
+                    visiblePage
+                        .querySelectorAll("tbody tr")
+                        .forEach(function (row) {
+
+                            row.style.display =
+                                row.textContent
+                                    .toLowerCase()
+                                    .includes(query)
+                                    ? ""
+                                    : "none";
+
+                        });
+                }
+            );
+        });
+
+
+    /* ==================== RESIZE ==================== */
+
+    window.addEventListener(
+        "resize",
+        function () {
+
+            if (window.innerWidth > 768) {
+                const overlay =
+                    document.getElementById("overlay");
+
+                const sidebar =
+                    document.getElementById("sidebar");
+
+                if (overlay) {
+                    overlay.classList.remove("show");
+                }
+
+                if (sidebar) {
+                    sidebar.classList.remove("open");
+                }
+            }
+
+            drawAllCharts();
+        }
+    );
+
+
+    /* ==================== INITIALIZE ==================== */
+
+    navigate("dashboard");
+
+    requestAnimationFrame(function () {
+        drawAllCharts();
+    });
+
+});
+
+
+function drawProjectChart() {
+    const canvas = document.getElementById("projectChart");
+
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = rect.width * dpr;
+    canvas.height = 260 * dpr;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const width = rect.width;
+    const height = 260;
+
+    const data = [18, 25, 22, 35, 30, 42, 48, 55, 62, 70, 76, 84];
+
+    const labels = [
+        "Jan", "Feb", "Mar", "Apr",
+        "May", "Jun", "Jul", "Aug",
+        "Sep", "Oct", "Nov", "Dec"
+    ];
+
+    const padding = {
+        top: 20,
+        right: 20,
+        bottom: 35,
+        left: 40
+    };
+
+    const chartWidth =
+        width - padding.left - padding.right;
+
+    const chartHeight =
+        height - padding.top - padding.bottom;
+
+    const maxValue = 100;
+
+    ctx.clearRect(0, 0, width, height);
+
+    /* Grid */
+
+    ctx.strokeStyle = "rgba(0,0,0,0.06)";
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i <= 5; i++) {
+
+        const y =
+            padding.top +
+            (chartHeight / 5) * i;
+
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(width - padding.right, y);
+        ctx.stroke();
+
+        ctx.fillStyle = "#A9A5A0";
+        ctx.font = "11px Inter";
+        ctx.textAlign = "right";
+
+        ctx.fillText(
+            100 - i * 20,
+            padding.left - 8,
+            y + 4
+        );
+    }
+
+    /* Points */
+
+    const points = data.map((value, index) => {
+
+        const x =
+            padding.left +
+            (chartWidth / (data.length - 1)) * index;
+
+        const y =
+            padding.top +
+            chartHeight -
+            (value / maxValue) * chartHeight;
+
+        return { x, y };
+    });
+
+    /* Area */
+
+    const gradient = ctx.createLinearGradient(
+        0,
+        padding.top,
+        0,
+        height - padding.bottom
+    );
+
+    gradient.addColorStop(
+        0,
+        "rgba(212,247,114,0.25)"
+    );
+
+    gradient.addColorStop(
+        1,
+        "rgba(212,247,114,0)"
+    );
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        points[0].x,
+        height - padding.bottom
+    );
+
+    points.forEach(point => {
+        ctx.lineTo(point.x, point.y);
+    });
+
+    ctx.lineTo(
+        points[points.length - 1].x,
+        height - padding.bottom
+    );
+
+    ctx.closePath();
+
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    /* Line */
+
+    ctx.beginPath();
+
+    points.forEach((point, index) => {
+
+        if (index === 0) {
+            ctx.moveTo(point.x, point.y);
+        } else {
+            ctx.lineTo(point.x, point.y);
+        }
+
+    });
+
+    ctx.strokeStyle = "#D4F772";
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    ctx.stroke();
+
+    /* Points */
+
+    points.forEach(point => {
+
+        ctx.beginPath();
+
+        ctx.arc(
+            point.x,
+            point.y,
+            4,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fill();
+
+        ctx.strokeStyle = "#D4F772";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+    });
+
+    /* Labels */
+
+    ctx.fillStyle = "#A9A5A0";
+    ctx.font = "11px Inter";
+    ctx.textAlign = "center";
+
+    labels.forEach((label, index) => {
+
+        ctx.fillText(
+            label,
+            points[index].x,
+            height - 10
+        );
+
+    });
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const loginEmail = localStorage.getItem("nexus_login_email");
+
+    if (loginEmail) {
+        document.getElementById("userEmail").textContent = loginEmail;
+    }
+});
+</script>
+
+
+<script>
+function logoutUser() {
+
+    const confirmLogout = confirm(
+        "Are you sure you want to logout?"
+    );
+
+    if (!confirmLogout) {
+        return;
+    }
+
+    /* Remove login session */
+    localStorage.removeItem("nexus_logged_in");
+    localStorage.removeItem("nexus_login_email");
+    localStorage.removeItem("nexus_login_role");
+    localStorage.removeItem("nexus_login_name");
+
+    /* Go back to Sign In */
+    window.location.href = "sigin.html";
+}
+</script>
+
+
+</body>
+</html>
